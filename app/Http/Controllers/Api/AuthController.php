@@ -66,6 +66,22 @@ class AuthController extends Controller
 			return response()->json(['message' => 'Successfully logged out']);
 	}
 
+	/**
+	 * Refresh a token.
+	 *
+	 * @return \Illuminate\Http\JsonResponse
+	 */
+	public function refresh()
+	{
+			return $this->respondWithToken(auth()->refresh());
+	}
+	/**
+	 * Get the token array structure.
+	 *
+	 * @param  string $token
+	 *
+	 * @return \Illuminate\Http\JsonResponse
+	 */
 	protected function respondWithToken($token)
     {
         return response()->json([
