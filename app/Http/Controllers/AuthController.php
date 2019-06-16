@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers;
 
 use App\User;
 use Illuminate\Http\Request;
@@ -15,18 +15,17 @@ class AuthController extends Controller
 	public function register(Request $request)
 	{
 		$rules = array (
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:6|confirmed',
-						'address' => 'required|string',
-						'phone_number' =>'required|unique:users',
-						'avatar' =>'file|image|mimes:jpeg,jpg,bmp,png,webp|max:2048',
-
-        );
+					'name' => 'required|string|max:255',
+					'email' => 'required|string|email|max:255|unique:users',
+					'password' => 'required|string|min:6|confirmed',
+					'address' => 'required|string',
+					'phone_number' =>'required|unique:users',
+					'avatar' =>'file|image|mimes:jpeg,jpg,bmp,png,webp|max:2048',
+			);
 
         $validator = Validator::make($request->all(), $rules);
 
-        if ($validator-> fails()){
+      if ($validator-> fails()){
 
 			return response()->json(['error' => $validator->errors()], 401);
 		}

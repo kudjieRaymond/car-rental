@@ -8,9 +8,12 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Traits\Uuids;
+use Hash;
 class User extends Authenticatable implements JWTSubject
 {
-    use Notifiable, Uuids, SoftDeletes ;
+		use Notifiable, Uuids, SoftDeletes ;
+		
+		public $incrementing =false ;
 
     /**
      * The attributes that are mass assignable.
@@ -59,10 +62,35 @@ class User extends Authenticatable implements JWTSubject
         return [];
 		}
 		
-		public function setPasswordAttribute($password)
+		 /**
+     * Hash password
+     * @param $input
+     */
+    public function setPasswordAttribute($input)
     {
-        if ( !empty($password) ) {
-            $this->attributes['password'] = bcrypt($password);
-        }
-    }  
+      if ($input)
+					$this->attributes['password'] = app('hash')->needsRehash($input) ? Hash::make($input) : $input;
+    }
+		
+		public function cars()
+		{
+			return $this->hasMany(Car::class);
+		}
+
+			public function car_types()
+		{
+			return $this->hasMany(CarType::class);
+		}
+
+			/** 
+	 * 
+	 * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+	 */
+	public function rentals()
+	{
+		return $this->belongsToMany(Car::class, 'rentals', 'user_id', 'car_id')
+								->withPivot('start_date', 'end_date', 'returned','created_by', 'modified_by')
+								->withTimestamps();
+	}
+
 }
