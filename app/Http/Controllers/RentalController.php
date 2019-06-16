@@ -20,7 +20,7 @@ class RentalController extends Controller
      */
     public function index()
     {
-        //
+			return RentalResource::collection(Rental::with()->paginate(25));
     }
 
     /**
@@ -29,11 +29,13 @@ class RentalController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request, Car $car, User $user)
+    public function store(Request $request)
     {
 			$rules = array (
 				'start_date' => 'required|date',
 				'end_date' => 'required|date',
+				'car_id' =>'required',
+				'client_id' =>'required',
 			);
 				
 			$validator = Validator::make($request->all(), $rules);
@@ -42,6 +44,16 @@ class RentalController extends Controller
 
 				return response()->json(['error' => $validator->errors()], 401);
 			}
+
+			if(!$car = Car::find($request->car_id)){
+
+				return response()->json(['error' =>"Car Not Found"]);
+		 	}
+		 
+		 	if(!$user = User::find($request->client_id)){
+
+				return response()->json(['error' =>"User Not Found"]);
+	 		} 
 
 			$rental = new Rental();
 			$rental->start_date = $request->start_date;
@@ -73,9 +85,45 @@ class RentalController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, Rental $rental)
     {
-        //
+			$rules = array (
+				'start_date' => 'required|date',
+				'end_date' => 'required|date',
+				'returned' => 'required|boolean',
+				'car_id' =>'required',
+				'client_id' =>'required',
+			);
+
+        
+         
+				
+			$validator = Validator::make($request->all(), $rules);
+
+			if ($validator-> fails()){
+
+				return response()->json(['error' => $validator->errors()], 401);
+			}
+
+			if(!$car = Car::find($request->car_id)){
+
+				return response()->json(['error' =>"Car Not Found"]);
+		 	}
+		 
+		 	if(!$user = User::find($request->client_id)){
+
+				return response()->json(['error' =>"User Not Found"]);
+	 		} 
+
+			$rental->start_date = $request->start_date;
+			$rental->end_date = $request->end_date;
+			$rental->client_id = $user->id;
+			$rental->car_id = $car->id;
+			$rental->returned = $request->returned;
+			$rental->modified_by = auth()->user()->id;
+			$rental->update();
+
+			return new RentalResource($rental);
     }
 
     /**

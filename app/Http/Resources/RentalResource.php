@@ -17,9 +17,10 @@ class RentalResource extends JsonResource
        return [
 
 				'id' => $this->id,
-				'start_date' => (string) $request->start_date,
-				'end_date' => (string) $request->end_date,
-				'code' => $request->code,
+				'start_date' => (string) $this->start_date,
+				'end_date' => (string) $this->end_date,
+				'code' =>  $this->code,
+				'returned' =>$this->returned,
 				'client' => new UserResource($this->client),
 				'created_by'=> new UserResource($this->user),
 			 ];
