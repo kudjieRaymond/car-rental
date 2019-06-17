@@ -18,7 +18,7 @@ class Car extends Model
 	 * @var array
 	 */
 	protected $fillable = [
-			'name', 'description','color', 'reg_num', 'car_type_id', 'created_by', 'modified_by'
+			'name', 'description','color', 'reg_num', 'car_type_id', 'created_by', 'modified_by', 'available'
 	];
 
 	public function car_type()
@@ -37,8 +37,8 @@ class Car extends Model
 	 */
 	public function rentals()
 	{
-		return $this->belongsToMany(User::class, 'rentals', 'car_id', 'user_id')
-								->withPivot('start_date', 'end_date', 'returned','created_by', 'modified_by')
+		return $this->belongsToMany(Rental::class, 'car_rental', 'car_id', 'rental_id')
+								//->withPivot('created_by', 'modified_by')
 								->withTimestamps();
 	}
 

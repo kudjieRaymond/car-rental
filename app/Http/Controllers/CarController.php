@@ -34,6 +34,7 @@ class CarController extends Controller
 						'name' => 'required|string|max:255',
 						'color' => 'required|string|max:255',
 						'car_type' => 'required|string',
+						'available' => 'required|boolean',
 						'reg_num' => 'required|string|unique:cars,reg_num',
 			);
 			
@@ -50,6 +51,7 @@ class CarController extends Controller
 				'description' => $request->description,
 				'color' => $request->color,
 				'reg_num' => $request->reg_num,
+				'available' => $request->available,
 				'car_type_id' => $request->car_type,
 				'created_by' => auth()->user()->id,
 			]);
@@ -83,6 +85,7 @@ class CarController extends Controller
 				'name' => 'required|string|max:255',
 				'color' => 'required|string|max:255',
 				'car_type' => 'required|string',
+				'available' => 'required|boolean',
 				'reg_num' => 'required|string|unique:cars,reg_num,'.$car->id,
 			);
 			
@@ -98,6 +101,7 @@ class CarController extends Controller
 			$car->description = $request->description;
 			$car->color =$request->color;
 			$car->reg_num = $request->reg_num;
+			$car->available = $request->available;
 			$car->car_type_id = $request->car_type;
 			$car->modified_by = auth()->user()->id;
 			$car->update();

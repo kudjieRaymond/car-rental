@@ -18,12 +18,9 @@ class CreateRentalsTable extends Migration
 					$table->primary('id');
 					$table->uuid('client_id');
 					$table->string('code');
-					$table->boolean('returned')->default(0);
 					$table->date('start_date')->nullable();
 					$table->date('end_date')->nullable();
-					$table->uuid('car_id');
 					$table->foreign('client_id')->references('id')->on('users')->onDelete('cascade');
-					$table->foreign('car_id')->references('id')->on('cars')->onDelete('cascade');
 					$table->uuid('created_by');
 					$table->uuid('modified_by')->nullable();
 					$table->timestamps();

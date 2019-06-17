@@ -34,8 +34,8 @@ class RentalController extends Controller
 			$rules = array (
 				'start_date' => 'required|date',
 				'end_date' => 'required|date',
-				'car_id' =>'required',
-				'client_id' =>'required',
+				'client_id' => 'required',
+				'cars' =>'required|array' ,
 			);
 				
 			$validator = Validator::make($request->all(), $rules);
@@ -45,10 +45,6 @@ class RentalController extends Controller
 				return response()->json(['error' => $validator->errors()], 401);
 			}
 
-			if(!$car = Car::find($request->car_id)){
-
-				return response()->json(['error' =>"Car Not Found"]);
-		 	}
 		 
 		 	if(!$user = User::find($request->client_id)){
 
@@ -59,10 +55,11 @@ class RentalController extends Controller
 			$rental->start_date = $request->start_date;
 			$rental->end_date = $request->end_date;
 			$rental->client_id = $user->id;
-			$rental->car_id = $car->id;
 			$rental->created_by = auth()->user()->id;
-			$rental->code = $car->reg_num."/". time();
+			$rental->code = "GH-".time();
 			$rental->save();
+
+			$rental->cars()->attach($request->cars);
 
 			return new RentalResource($rental);
     }

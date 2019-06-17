@@ -20,7 +20,7 @@ class CarResource extends JsonResource
 				'description' => $this->description,
 				'color' =>$this->color,
 				'reg_num' =>$this->reg_num,
-
+				'available' =>$this->available,
         'created_at' => (string) $this->created_at,
 				'updated_at' => (string) $this->updated_at,
 				'created_by' => new UserResource($this->user),

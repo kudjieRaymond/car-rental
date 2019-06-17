@@ -25,4 +25,15 @@ class Rental extends Model
 
 	protected $dates =['start_date', 'end_date'];
 
+		/** 
+	 * 
+	 * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+	 */
+	public function cars()
+	{
+		return $this->belongsToMany(Car::class, 'car_rental', 'rental_id', 'car_id')
+								//->withPivot('created_by', 'modified_by')
+								->withTimestamps();
+	}
+
 }

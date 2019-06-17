@@ -38,7 +38,7 @@ Route::group(['middleware' => 'cors','prefix' => '/v1'], function () {
 		Route::get('car_types/{car_type}', 'CarTypeController@show');
 		Route::post('car_types/{car_type}/update', 'CarTypeController@update');
 
-		Route::post('cars/{car}/{user}/rentals/save', 'RentalController@store');
+		Route::post('rentals/save', 'RentalController@store');
 		Route::get('rentals/{rental}', 'RentalController@show');
 
 		Route::get('users/', 'UserController@index');

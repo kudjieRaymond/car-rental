@@ -20,6 +20,7 @@ class CreateCarsTable extends Migration
 					$table->string('reg_num')->nullable();
 					$table->string('description')->nullable();
 					$table->string('color')->nullable();
+					$table->boolean('available')->default(0);
 					$table->uuid('car_type_id');
 					$table->uuid('created_by');
 					$table->uuid('modified_by')->nullable();

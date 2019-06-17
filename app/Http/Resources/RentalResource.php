@@ -15,12 +15,13 @@ class RentalResource extends JsonResource
     public function toArray($request)
     {
        return [
-
 				'id' => $this->id,
 				'start_date' => (string) $this->start_date,
 				'end_date' => (string) $this->end_date,
 				'code' =>  $this->code,
-				'returned' =>$this->returned,
+				'pivot'=> $this->whenPivotLoaded('car_rental', function () {
+					return $this->pivot->returned;
+				}),
 				'client' => new UserResource($this->client),
 				'created_by'=> new UserResource($this->user),
 			 ];
