@@ -10,7 +10,7 @@ use App\User;
 use App\Http\Resources\RentalResource;
 use Carbon\Carbon;
 use Validator;
-
+use DB ;
 class RentalController extends Controller
 {
     /**
@@ -49,19 +49,30 @@ class RentalController extends Controller
 		 	if(!$user = User::find($request->client_id)){
 
 				return response()->json(['error' =>"User Not Found"]);
-	 		} 
+			 }
+			DB::beginTransaction();  
 
-			$rental = new Rental();
-			$rental->start_date = $request->start_date;
-			$rental->end_date = $request->end_date;
-			$rental->client_id = $user->id;
-			$rental->created_by = auth()->user()->id;
-			$rental->code = "GH-".time();
-			$rental->save();
+			try{
+				$rental = new Rental();
+				$rental->start_date = $request->start_date;
+				$rental->end_date = $request->end_date;
+				$rental->client_id = $user->id;
+				$rental->created_by = auth()->user()->id;
+				$rental->code = "GH-".time();
+				$rental->save();
 
-			$rental->cars()->attach($request->cars);
+				$rental->cars()->attach($request->cars);
 
-			return new RentalResource($rental);
+				DB::commit();
+
+				return new RentalResource($rental);
+				
+			} catch (\Exception $e) {
+
+				DB::rollback();
+
+				return response()->json(['error' => 'Car Rental record not Created'], 401);
+			}
     }
 
     /**
@@ -87,14 +98,10 @@ class RentalController extends Controller
 			$rules = array (
 				'start_date' => 'required|date',
 				'end_date' => 'required|date',
-				'returned' => 'required|boolean',
-				'car_id' =>'required',
 				'client_id' =>'required',
+				'cars' =>'required|array' ,
 			);
-
-        
-         
-				
+	
 			$validator = Validator::make($request->all(), $rules);
 
 			if ($validator-> fails()){
@@ -102,25 +109,79 @@ class RentalController extends Controller
 				return response()->json(['error' => $validator->errors()], 401);
 			}
 
-			if(!$car = Car::find($request->car_id)){
+			/*if(!$car = Car::find($request->car_id)){
 
 				return response()->json(['error' =>"Car Not Found"]);
-		 	}
+		 	}*/
 		 
-		 	if(!$user = User::find($request->client_id)){
-
+			 if(!$user = User::find($request->client_id))
+			 {
 				return response()->json(['error' =>"User Not Found"]);
-	 		} 
+				}
+				 
+			DB::beginTransaction();  
 
-			$rental->start_date = $request->start_date;
-			$rental->end_date = $request->end_date;
-			$rental->client_id = $user->id;
-			$rental->car_id = $car->id;
-			$rental->returned = $request->returned;
-			$rental->modified_by = auth()->user()->id;
-			$rental->update();
+			try{
+				$data = [];
+				foreach($request->cars as $key=>$value) 
+				{
+					$data[$key] = ["returned" => $value];
+				}
 
-			return new RentalResource($rental);
+				$rental->start_date = $request->start_date;
+				$rental->end_date = $request->end_date;
+				$rental->client_id = $user->id;
+				$rental->modified_by = auth()->user()->id;
+				$rental->update();
+
+				$rental->cars()->sync($data);
+
+				DB::commit();
+
+				return new RentalResource($rental);
+				
+			} catch (\Exception $e) {
+
+				DB::rollback();
+
+				return response()->json(['error' => ' Rental record  not Updated'], 401);
+			}
+		}
+		
+		 /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function update_individual_car(Request $request, Rental $rental, Car $car)
+    {
+			$rules = array ('returned' =>'required|boolean');
+	
+			$validator = Validator::make($request->all(), $rules);
+
+			if ($validator-> fails()){
+
+				return response()->json(['error' => $validator->errors()], 401);
+			}
+			 
+			DB::beginTransaction();  
+
+			try{
+			
+				$rental->cars()->updateExistingPivot($car->id, ['returned'=>$request->returned]);
+
+				DB::commit();
+
+				return new RentalResource($rental);
+				
+			} catch (\Exception $e) {
+
+				DB::rollback();
+
+				return response()->json(['error' => ' Car Rental record  not Updated'], 401);
+			}
     }
 
     /**

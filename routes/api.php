@@ -40,6 +40,8 @@ Route::group(['middleware' => 'cors','prefix' => '/v1'], function () {
 
 		Route::post('rentals/save', 'RentalController@store');
 		Route::get('rentals/{rental}', 'RentalController@show');
+		Route::post('rentals/{rental}/update/all', 'RentalController@update');
+		Route::post('rentals/{rental}/update/{car}', 'RentalController@update_individual_car');
 
 		Route::get('users/', 'UserController@index');
 		Route::post('users/save', 'UserController@store');

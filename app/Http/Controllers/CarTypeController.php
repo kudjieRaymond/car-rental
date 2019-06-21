@@ -37,13 +37,21 @@ class CarTypeController extends Controller
 				return response()->json(['error' => $validator->errors()], 401);
 			}
 
-			$car_type = CarType::create([
-        'name' => $request->name,
-				'description' => $request->description,
-				'created_by' => auth()->user()->id,
-			]);
+			try{
+				$car_type = CarType::create([
+					'name' => $request->name,
+					'description' => $request->description,
+					'created_by' => auth()->user()->id,
+				]);
+	
+				return new CarTypeResource($car_type);
+				
+			} catch (\Exception $e) {
 
-			return new CarTypeResource($car_type);
+				return response()->json(['error' => 'Car type record Could not be created'], 401);
+			}
+
+			
 
     }
 
@@ -76,10 +84,18 @@ class CarTypeController extends Controller
 
 				return response()->json(['error' => $validator->errors()], 401);
 			}
-				
-			$car_type->update($request->only(['name', 'description']));
+
+			try{
+				$car_type->update($request->only(['name', 'description']));
 			
-			return new CarTypeResource($car_type);
+				return new CarTypeResource($car_type);
+				
+			} catch (\Exception $e) {
+
+				return response()->json(['error' => 'Car type record Could not be Updated'], 401);
+			}
+				
+			
 
     }
 
@@ -91,8 +107,16 @@ class CarTypeController extends Controller
      */
     public function destroy(CarType $car_type)
     {
-			$car_type->delete();
+			
+			
+			try{
+				$car_type->delete();
 
-      return response()->json(null, 204);
+				return response()->json(null, 204);
+				
+			} catch (\Exception $e) {
+
+				return response()->json(['error' => 'Car type record Could not be Deleted'], 401);
+			}
     }
 }

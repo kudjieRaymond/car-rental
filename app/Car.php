@@ -38,7 +38,7 @@ class Car extends Model
 	public function rentals()
 	{
 		return $this->belongsToMany(Rental::class, 'car_rental', 'car_id', 'rental_id')
-								//->withPivot('created_by', 'modified_by')
+								->withPivot('returned')
 								->withTimestamps();
 	}
 

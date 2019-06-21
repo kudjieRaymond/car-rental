@@ -19,9 +19,7 @@ class RentalResource extends JsonResource
 				'start_date' => (string) $this->start_date,
 				'end_date' => (string) $this->end_date,
 				'code' =>  $this->code,
-				'pivot'=> $this->whenPivotLoaded('car_rental', function () {
-					return $this->pivot->returned;
-				}),
+				'cars'=> CarResource::collection($this->cars),
 				'client' => new UserResource($this->client),
 				'created_by'=> new UserResource($this->user),
 			 ];

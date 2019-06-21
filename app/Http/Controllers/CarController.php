@@ -6,6 +6,7 @@ use App\Car;
 use App\Http\Resources\CarResource;
 use Illuminate\Http\Request;
 use Validator;
+use DB;
 
 class CarController extends Controller
 {
@@ -37,26 +38,34 @@ class CarController extends Controller
 						'available' => 'required|boolean',
 						'reg_num' => 'required|string|unique:cars,reg_num',
 			);
-			
 				
 			$validator = Validator::make($request->all(), $rules);
 
-			if ($validator-> fails()){
-
+			if ($validator-> fails())
+			{
 				return response()->json(['error' => $validator->errors()], 401);
 			}
 
-			$car = Car::create([
-        'name' => $request->name,
-				'description' => $request->description,
-				'color' => $request->color,
-				'reg_num' => $request->reg_num,
-				'available' => $request->available,
-				'car_type_id' => $request->car_type,
-				'created_by' => auth()->user()->id,
-			]);
+	
+			try {
 
-			return new CarResource($car);
+				$car = Car::create([
+					'name' => $request->name,
+					'description' => $request->description,
+					'color' => $request->color,
+					'reg_num' => $request->reg_num,
+					'available' => $request->available,
+					'car_type_id' => $request->car_type,
+					'created_by' => auth()->user()->id,
+				]);
+	
+				return new CarResource($car);
+
+			} catch (\Exception $e) {
+
+				return response()->json(['error' => 'Car Record Could not be Created'], 401);
+			}
+			
     }
 
     /**
@@ -97,16 +106,25 @@ class CarController extends Controller
 				return response()->json(['error' => $validator->errors()], 401);
 			}
 
-			$car->name = $request->name;
-			$car->description = $request->description;
-			$car->color =$request->color;
-			$car->reg_num = $request->reg_num;
-			$car->available = $request->available;
-			$car->car_type_id = $request->car_type;
-			$car->modified_by = auth()->user()->id;
-			$car->update();
+			try {
+				
+				$car->name = $request->name;
+				$car->description = $request->description;
+				$car->color =$request->color;
+				$car->reg_num = $request->reg_num;
+				$car->available = $request->available;
+				$car->car_type_id = $request->car_type;
+				$car->modified_by = auth()->user()->id;
+				$car->update();
 
 			return new CarResource($car);
+				
+			} catch (\Exception $e) {
+
+				return response()->json(['error' => 'Car record Could not be updated'], 401);
+			}
+
+			
     }
 
     /**

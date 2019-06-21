@@ -24,7 +24,10 @@ class CarResource extends JsonResource
         'created_at' => (string) $this->created_at,
 				'updated_at' => (string) $this->updated_at,
 				'created_by' => new UserResource($this->user),
-				'car_type' =>new CarTypeResource($this->car_type)
+				'car_type' =>new CarTypeResource($this->car_type),
+				'returned'=> $this->whenPivotLoaded('car_rental', function () {
+					return $this->pivot->returned;
+				}),
        
       ];
     }
