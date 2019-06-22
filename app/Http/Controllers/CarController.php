@@ -107,7 +107,7 @@ class CarController extends Controller
 			}
 
 			try {
-				
+
 				$car->name = $request->name;
 				$car->description = $request->description;
 				$car->color =$request->color;

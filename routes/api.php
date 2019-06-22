@@ -24,7 +24,7 @@ Route::group(['middleware' => 'cors','prefix' => '/v1'], function () {
 
 	Route::post('register', 'AuthController@register');
 	Route::post('login', 'AuthController@login');
-	Route::get('logout/', 'AuthController@logout');   
+	Route::post('logout/', 'AuthController@logout');   
 
 
 	Route::group(['middleware' =>['auth:api']], function () { 
